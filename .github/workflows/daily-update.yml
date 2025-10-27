@@ -1,27 +1,34 @@
-name: Daily Commit
+name: Daily DevSync Update [22f1001491@ds.study.iitm.ac.in]
 
 on:
   schedule:
-    - cron: '15 4 * * *'
+    - cron: '35 1 * * *'
   workflow_dispatch:
 
 jobs:
-  commit:
+  daily-commit:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up git for pushing
+        run: |
+          git config user.name "DevSyncBot"
+          git config user.email "22f1001491@ds.study.iitm.ac.in"
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main --rebase
+
+      - name: Daily Commit by 22f1001491@ds.study.iitm.ac.in
+        run: |
+          echo "Daily update: $(date)" >> daily-status.log
+          git add daily-status.log
+          git commit -m "Daily automated commit: $(date)" || echo "No changes to commit"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # ✅ allows push access
-
-      - name: Commit step - 22f1001491@ds.study.iitm.ac.in
-        run: |
-          echo "TDSFU Daily run: $(date -u) TDSFU" >> daily-log.txt
-
-      - name: Git Commit and Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add daily-log.txt
-          git commit -m "Auto commit at $(date -u)" || echo "No changes to commit"
-          git push
+          github_token:token: ${{ secrets.TDS_PROJECT-1_GITHUB_TOKEN }} 
